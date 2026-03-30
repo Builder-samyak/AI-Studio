@@ -1,10 +1,10 @@
-# 🧠 AI-Studio-ClearML
+# AI-Studio-ClearML
 
 This repository provides a minimal, reproducible example of how to use [ClearML](https://clear.ml) to build machine learning pipelines, track experiments, and manage datasets using both **task-based pipelines** and **function-based pipelines**.
 
 ---
 
-## 📦 Project Structure
+## Project Structure
 
 ```
 ├── AI-Studio-ClearML.ipynb           # End-to-end demo notebook
@@ -24,18 +24,18 @@ This repository provides a minimal, reproducible example of how to use [ClearML]
 
 ---
 
-## 🧪 Features
+## Features
 
-- ✅ Task-based pipeline using `PipelineController.add_step(...)`
+- Task-based pipeline using `PipelineController.add_step(...)`
 - [TBD] Function-based pipeline using `PipelineController.add_function_step(...)`
-- ✅ Reusable ClearML Task templates
-- ✅ Dataset and model artifact management with ClearML
-- ✅ End-to-end ML workflow: Dataset → Preprocessing → Training
-- ✅ Fully compatible with ClearML Hosted and ClearML Server
+- Reusable ClearML Task templates
+- Dataset and model artifact management with ClearML
+- End-to-end ML workflow: Dataset → Preprocessing → Training
+- Fully compatible with ClearML Hosted and ClearML Server
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Install Dependencies
 
@@ -117,13 +117,13 @@ python main.py # Where we execute the run_pipeline()
 
 ---
 
-### 🔧 [TBD] Option 2: Pipeline from Local Python Functions 
+### [TBD] Option 2: Pipeline from Local Python Functions 
 
 This version demonstrates using `add_function_step(...)` to wrap Python logic as pipeline steps.
 
 ---
 
-### 🧩 Run Individual Pipeline Steps
+### Run Individual Pipeline Steps
 
 You can run each task separately as well:
 
@@ -144,7 +144,7 @@ python s3_train_model.py
 
 ---
 
-## 📘 References
+## References
 
 - [ClearML Documentation](https://clear.ml/docs)
 - [ClearML Pipelines Guide](https://clear.ml/docs/latest/docs/getting_started/building_pipelines)
@@ -152,7 +152,7 @@ python s3_train_model.py
 
 ---
 
-## 🙌 Acknowledgments
+## Acknowledgments
 
 This project is developed and maintained by:
 
@@ -161,6 +161,6 @@ This project is developed and maintained by:
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
