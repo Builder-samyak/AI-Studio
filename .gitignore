@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+*.egg-info/
+.env
+
+# Model checkpoints (too large for GitHub)
+*.pth
+*.pkl
+*.pt
+
+# Data manifests (generated at runtime)
+/tmp/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

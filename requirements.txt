@@ -1,0 +1,9 @@
+clearml
+torch
+torchvision
+scikit-learn
+Pillow
+opencv-python
+numpy
+streamlit
+requests

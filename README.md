@@ -1,90 +1,124 @@
-# AI Studio – Breast Cancer Detection (Sprint 2: MLOps Pipeline)
+# AI-Based Breast Cancer Detection System
 
-## Overview
-This project focuses on building an AI-based solution for breast cancer detection using histopathology images.  
-In Sprint 2, the primary objective was to design and implement an **MLOps pipeline** for reproducible and modular model training using ClearML.
+**Team Destroyers** | 42174 Artificial Intelligence Studio — Autumn 2026 | University of Technology Sydney
 
----
-
-## Sprint 2 Objective
-- Build an end-to-end MLOps pipeline
-- Ensure modularity and reproducibility
-- Integrate data loading, preprocessing, and model training
-- Track experiments using ClearML
+| Role | Name |
+|------|------|
+| Project Manager / Product Owner | Harshitha Kolgatta Swamy |
+| Data Scientist / Solution Designer | Aagusthya Shanker |
+| Data Engineer / Tech Lead | Samyak Borkar |
 
 ---
 
-## Project Structure
-src/
-├── data/
-│ ├── data_loader.py
-│ ├── data_preprocessing.py
-│
-├── models/
-│ ├── train.py
-│ ├── evaluate.py
-│
-├── pipeline/
-│ ├── clearml_pipeline.py
+## Project overview
+
+An AI-assisted system for breast cancer detection using histopathology images. Classifies images as **Cancer** or **Non-Cancer** using a fine-tuned EfficientNet-B0 model. Provides Grad-CAM visual explanations and NLP-based plain-English explanations via a Streamlit web interface.
+
+### Model results — full dataset (277,524 images)
+
+| Model | Dataset | Accuracy | Recall | AUC |
+|-------|---------|----------|--------|-----|
+| SimpleCNN | 5k subset | 81.8% | 83.62% | 0.8939 |
+| ResNet18 | 5k subset | 86.3% | 88.82% | 0.9330 |
+| **EfficientNet-B0** | **Full 277k** | **91.97%** ✓ | **87.03%** ✓ | **0.9699** ✓ |
+
+PRD targets: accuracy ≥ 90% ✓ · recall ≥ 85% ✓ · AUC ≥ 0.90 ✓
 
 ---
 
-## MLOps Pipeline (ClearML)
+## Repository structure
+AI-Studio/
+├── src/
+│   ├── data/
+│   │   ├── data_loader.py          # ClearML dataset fetch
+│   │   └── data_preprocessing.py  # Transforms, splits, BreastCancerDataset
+│   ├── models/
+│   │   ├── train.py                # EfficientNet-B0 training + ClearML logging
+│   │   └── evaluate.py             # Test evaluation, quality gate, Grad-CAM, registry
+│   ├── pipeline/
+│   │   └── clearml_pipeline.py     # 4-stage ClearML pipeline controller
+│   └── nlp/
+│       └── explainer.py            # NLP explanation module
+├── app/
+│   └── streamlit_app.py            # Streamlit web UI
+├── .github/
+│   └── workflows/
+│       └── pipeline.yml            # GitHub Actions CI/CD trigger
+├── create_dataset.py               # ClearML dataset registration
+├── data_loader.py                  # ClearML dataset loader
+├── main.py                         # Pipeline entry point
+└── requirements.txt
+---
 
-The pipeline consists of three main stages:
+## MLOps pipeline (ClearML — Level 1/2)
 
-1. **Data Loading**
-   - Loads image dataset
-   - Supports subset sampling for faster testing
+4-stage automated pipeline:
 
-2. **Data Preprocessing**
-   - Image resizing
-   - Normalization
-   - Data transformations
+| Stage | ClearML Task | Output |
+|-------|-------------|--------|
+| Step 1 | step_data_loading | train/val/test manifests (70/15/15 split) |
+| Step 2 | step_preprocessing | Validated splits, transform config logged |
+| Step 3 | step_training | Best EfficientNet-B0 checkpoint, per-epoch metrics |
+| Step 4 | step_evaluation | Test metrics, quality gate, Grad-CAM, model registry |
 
-3. **Model Training**
-   - CNN-based model training
-   - Runs on a small subset for quick iteration
-   - Tracks training progress via logs
+CI/CD: GitHub Actions triggers the ClearML pipeline on every push to `main`.
 
 ---
 
-## Execution Environment
-The pipeline was executed in **AWS SageMaker**, providing a scalable environment for running and testing the workflow.
+## Setup
+
+### 1. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Configure ClearML
+```bash
+clearml-init
+# Enter credentials from app.clear.ml → Settings → Workspace → API Credentials
+```
+
+### 3. Set dataset path
+```bash
+export DATA_PATH=/home/sagemaker-user/user-default-efs/data/IDC_regular_ps50_idx5
+```
+
+### 4. Quick test (200 images, 2 epochs)
+```bash
+SUBSET_SIZE=200 NUM_EPOCHS=2 PIPELINE_MODE=local python main.py
+```
+
+### 5. Full training run
+```bash
+python main.py
+# Tracks at https://app.clear.ml
+```
+
+### 6. Run Streamlit UI
+```bash
+MODEL_PATH=/path/to/efficientnet_b0_best.pth streamlit run app/streamlit_app.py
+```
 
 ---
 
-## Experiment Tracking
-All runs are tracked using **ClearML**, including:
-- Pipeline execution
-- Logs for each stage
-- Reproducible experiment setup
+## GitHub Actions CI/CD
+
+Every push to `main` triggers the ClearML pipeline automatically.
+
+Required GitHub secrets (Settings → Secrets → Actions):
+- `CLEARML_API_ACCESS_KEY`
+- `CLEARML_API_SECRET_KEY`
 
 ---
 
-## Key Features
-- Modular code structure
-- Reproducible pipeline
-- Clear separation of concerns
-- Scalable design for future improvements
+## Links
+
+- [Jira Sprint Board](https://student-team-v90hneil.atlassian.net/jira/software/projects/D1/list)
+- [Confluence Documentation](https://student-team-ucce3i5a.atlassian.net/wiki/spaces/Destroyers)
+- [ClearML Dashboard](https://app.clear.ml)
 
 ---
 
-## Limitations (Sprint 2 Scope)
-- Training performed on a small subset of data
-- UI and NLP components were out of scope for this sprint
-- Focus was strictly on MLOps pipeline development
+## Disclaimer
 
----
-
-## Future Work
-- Scale pipeline to full dataset
-- Integrate advanced models (e.g., YOLO)
-- Add NLP module for clinical queries
-- Improve automation and deployment
-
----
-
-## Author
-Harshitha Kolgatta Swamy  
-Master of Artificial Intelligence – UTS
+This system is a research prototype and decision-support tool only. It is not a clinical diagnostic device and must not replace professional medical diagnosis.
