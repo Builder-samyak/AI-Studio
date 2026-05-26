@@ -1,43 +1,59 @@
-name: Breast Cancer — ClearML Pipeline
+name: RadiScan — ClearML Pipeline
 
 on:
   push:
     branches: [main]
-    paths: ['src/**', 'main.py', 'requirements.txt']
+    paths:
+      - 'src/**'
+      - 'main.py'
+      - 'requirements.txt'
   workflow_dispatch:
-    inputs:
-      subset_size:
-        description: 'Subset size (0=full dataset)'
-        default: '0'
-      num_epochs:
-        description: 'Training epochs'
-        default: '15'
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   trigger-pipeline:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: '3.10'}
-      - run: pip install clearml
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install clearml
+
       - name: Write ClearML credentials
         env:
           CLEARML_API_ACCESS_KEY: ${{ secrets.CLEARML_API_ACCESS_KEY }}
           CLEARML_API_SECRET_KEY: ${{ secrets.CLEARML_API_SECRET_KEY }}
         run: |
           mkdir -p ~/.clearml
-          printf 'api {\n  web_server: https://app.clear.ml\n  api_server: https://api.clear.ml\n  files_server: https://files.clear.ml\n  credentials { access_key: "%s" secret_key: "%s" }\n}\n' \
-            "$CLEARML_API_ACCESS_KEY" "$CLEARML_API_SECRET_KEY" > ~/.clearml/clearml.conf
-      - name: Trigger ClearML pipeline
+          python3 -c "
+          import os
+          key = os.environ['CLEARML_API_ACCESS_KEY']
+          secret = os.environ['CLEARML_API_SECRET_KEY']
+          conf = '''api {
+            web_server: https://app.clear.ml
+            api_server: https://api.clear.ml
+            files_server: https://files.clear.ml
+            credentials {
+              access_key: \"''' + key + '''\"
+              secret_key: \"''' + secret + '''\"
+            }
+          }'''
+          open(os.path.expanduser('~/.clearml/clearml.conf'), 'w').write(conf)
+          print('Credentials written.')
+          "
+
+      - name: Trigger ClearML Pipeline
         env:
           CLEARML_API_ACCESS_KEY: ${{ secrets.CLEARML_API_ACCESS_KEY }}
           CLEARML_API_SECRET_KEY: ${{ secrets.CLEARML_API_SECRET_KEY }}
-          SUBSET_SIZE:     ${{ github.event.inputs.subset_size || '0' }}
-          NUM_EPOCHS:      ${{ github.event.inputs.num_epochs  || '15' }}
-          PIPELINE_MODE:   remote
-          CLEARML_PROJECT: AI-Studio
-          CLEARML_PIPELINE: Breast Cancer Pipeline
-          REPO_ROOT:       /home/sagemaker-user/AI-Studio-GPU
         run: python main.py
